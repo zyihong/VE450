@@ -15,14 +15,18 @@ class Traindataset(Dataset):
         X=[]
         Y=[]
         for i in images:
-            X.append(torch.Tensor(cv2.imread(os.path.join(RESIZE_IMAGE_DIR,i))))
-            Y.append(0 if i[0]=='A' else 1 )
-        self.X=X
-        self.Y=torch.Tensor(Y)
-        self.len=self.Y.shape[0]
+            # print('image name: ', i)
+            q = cv2.imread(os.path.join(RESIZE_IMAGE_DIR, i)) / 255
+            # print(q)
+            X.append(torch.Tensor(q))
+            Y.append(0 if i[0] == 'A' else 1)
+        self.X = X
+        self.Y = torch.Tensor(Y)
+        # print('Y: ', Y)
+        self.len = self.Y.shape[0]
 
     def __getitem__(self,index):
-        return self.X[index].permute((2,0,1)),self.Y[index]
+        return self.X[index].permute((2, 0, 1)), self.Y[index]
 
     def __len__(self):
         return self.len
