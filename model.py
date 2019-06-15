@@ -13,18 +13,18 @@ class CNN(nn.Module):
         self.conv=torch.nn.Conv2d(3,12,kernel_size=3,padding=1)
         self.act=torch.nn.ReLU()
         self.conv2=torch.nn.Conv2d(12,12,kernel_size=3,padding=1)
-        self.max=torch.nn.MaxPool2d(2,2)
-        self.conv3=torch.nn.Conv2d(12,24,kernel_size=3,padding=1)
-        self.fc1=torch.nn.Linear(32*32*24,100)
+        # self.max=torch.nn.MaxPool2d(2,2)
+        # self.conv3=torch.nn.Conv2d(12,24,kernel_size=3,padding=1)
+        self.fc1=torch.nn.Linear(64*64*12,100)
         self.fc2=torch.nn.Linear(100,1)
         self.sig=torch.nn.Sigmoid()
     def forward(self,x):
         convout=self.conv(x)
         convout2=self.conv2(F.relu(convout))
-        convout2=self.max(F.relu(convout2))
-        convout3=self.conv3(convout2)
-        fcout1=self.fc1(F.relu(convout3).view(convout.shape[0],-1))
-        output=self.fc2(F.relu(fcout1))
+        # convout2=self.max(F.relu(convout2))
+        # convout3=self.conv3(convout2)
+        fcout1=self.fc1(self.act(convout2).view(convout2.shape[0], -1))
+        output=self.fc2(self.act(fcout1))
         output=self.sig(output)
         return output
 
@@ -58,7 +58,7 @@ model=CNN().to(device)
 train=Traindataset()
 trainloader=DataLoader(dataset=train, batch_size=5, shuffle=True)
 testloader = DataLoader(dataset=train, batch_size=5, shuffle=True)
-optimizer = torch.optim.Adam(model.parameters(), lr=0.01, weight_decay=0.001)
+optimizer = torch.optim.Adam(model.parameters(), lr=0.00001)#, weight_decay=0)
 
 criterion=torch.nn.BCELoss()
 losses=0
@@ -70,7 +70,7 @@ for _ in range(EPOCH):
       y_pred = model(img)
       #print('label size: ', label.size())
       #print('ypred size: ', y_pred.size())
-      yy = y_pred.reshape(y_pred.shape[0])
+      # yy = y_pred.reshape(y_pred.shape[0])
       #print('yypred size: ', yy.size())
       loss = criterion(y_pred.reshape(y_pred.shape[0]), label)
 

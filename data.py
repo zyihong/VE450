@@ -16,7 +16,7 @@ class Traindataset(Dataset):
         Y=[]
         for i in images:
             # print('image name: ', i)
-            q = cv2.imread(os.path.join(RESIZE_IMAGE_DIR, i)) / 255
+            q = cv2.imread(os.path.join(RESIZE_IMAGE_DIR, i))
             # print(q)
             X.append(torch.Tensor(q))
             Y.append(0 if i[0] == 'A' else 1)
