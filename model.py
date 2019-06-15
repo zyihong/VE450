@@ -4,7 +4,7 @@ from torch.utils.data import Dataset,DataLoader,TensorDataset
 import torch.nn.functional as F
 from data import Traindataset
 
-EPOCH=40
+EPOCH=800
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 class CNN(nn.Module):
@@ -16,7 +16,7 @@ class CNN(nn.Module):
         # self.max=torch.nn.MaxPool2d(2,2)
         # self.conv3=torch.nn.Conv2d(12,24,kernel_size=3,padding=1)
         self.fc1=torch.nn.Linear(64*64*12,100)
-        self.fc2=torch.nn.Linear(100,1)
+        self.fc2=torch.nn.Linear(100,5)
         self.sig=torch.nn.Sigmoid()
     def forward(self,x):
         convout=self.conv(x)
@@ -58,9 +58,9 @@ model=CNN().to(device)
 train=Traindataset()
 trainloader=DataLoader(dataset=train, batch_size=5, shuffle=True)
 testloader = DataLoader(dataset=train, batch_size=5, shuffle=True)
-optimizer = torch.optim.Adam(model.parameters(), lr=0.00001)#, weight_decay=0)
+optimizer = torch.optim.Adam(model.parameters(), lr=0.000005)#,weight_decay=0)
 
-criterion=torch.nn.BCELoss()
+criterion=torch.nn.CrossEntropyLoss()
 losses=0
 for _ in range(EPOCH):
     for (img,label) in trainloader:
@@ -72,7 +72,7 @@ for _ in range(EPOCH):
       #print('ypred size: ', y_pred.size())
       # yy = y_pred.reshape(y_pred.shape[0])
       #print('yypred size: ', yy.size())
-      loss = criterion(y_pred.reshape(y_pred.shape[0]), label)
+      loss = criterion(y_pred, label)
 
       loss.backward()
       losses += loss.item()
@@ -86,8 +86,8 @@ for _ in range(EPOCH):
           img = img.to(device)
           label = label.to(device)
           y_pred = model(img)
-          yy = y_pred.reshape(y_pred.shape[0])
-          predicted = (yy.data > 0.5).float()
+          # yy = y_pred.reshape(y_pred.shape[0])
+          predicted = torch.argmax(y_pred,dim=0)
           total += label.size(0)
           correct += (predicted == label).sum().item()
 

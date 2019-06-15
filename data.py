@@ -8,7 +8,7 @@ import cv2
 RESIZE_IMAGE_DIR="./resize"
 IMAGE_DIR="./pictures"
 IMAGE_SIZE=[64,64]
-
+labels={"airbag":0,"oilFilter":1,"safetyBelt":2,"spring":3,"tire":4}
 class Traindataset(Dataset):
     def __init__(self):
         images = os.listdir(IMAGE_DIR)
@@ -19,9 +19,9 @@ class Traindataset(Dataset):
             q = cv2.imread(os.path.join(RESIZE_IMAGE_DIR, i))
             # print(q)
             X.append(torch.Tensor(q))
-            Y.append(0 if i[0] == 'A' else 1)
+            Y.append(labels[i.split('_')[0]])
         self.X = X
-        self.Y = torch.Tensor(Y)
+        self.Y = torch.LongTensor(Y)
         # print('Y: ', Y)
         self.len = self.Y.shape[0]
 
@@ -49,4 +49,4 @@ def resize_image():
 
     print('Finish resizing images')
 
-# resize_image()
+#resize_image()
