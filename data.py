@@ -49,4 +49,4 @@ def resize_image():
 
     print('Finish resizing images')
 
-#resize_image()
+# resize_image()
