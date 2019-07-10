@@ -6,17 +6,17 @@ from tqdm import tqdm
 import torch
 import cv2
 RESIZE_IMAGE_DIR="./resize"
-IMAGE_DIR="./pictures"
+IMAGE_DIR="./Archive"
 IMAGE_SIZE=[64,64]
-labels={"airbag":0,"oilFilter":1,"safetyBelt":2,"spring":3,"tire":4}
+labels={"airbag":0,"oilFilter":1,"safetyBelt":2,"spring":3,"tire":4,}
 class Traindataset(Dataset):
-    def __init__(self):
-        images = os.listdir(IMAGE_DIR)
+    def __init__(self,DIR):
+        images = os.listdir(DIR)
         X=[]
         Y=[]
         for i in images:
             # print('image name: ', i)
-            q = cv2.imread(os.path.join(RESIZE_IMAGE_DIR, i))
+            q = cv2.imread(os.path.join(DIR, i))
             # print(q)
             X.append(torch.Tensor(q))
             Y.append(labels[i.split('_')[0]])
@@ -36,17 +36,18 @@ class Traindataset(Dataset):
 def resize_image():
     if not os.path.exists(RESIZE_IMAGE_DIR):
         os.makedirs(RESIZE_IMAGE_DIR)
+    stuff= os.listdir(IMAGE_DIR)[0:-1]
+    for name in stuff:
+        images = os.listdir(os.path.join(IMAGE_DIR,name))
+        # num_images = len(images)
 
-    images = os.listdir(IMAGE_DIR)
-    # num_images = len(images)
-
-    for i, image in enumerate(tqdm(images)):
-        with open(os.path.join(IMAGE_DIR, image), 'r+b') as f:
-            with Image.open(f) as img:
-                # img = resize_image(img, IMAGE_SIZE)
-                resize_img = resizeimage.resize_cover(img, IMAGE_SIZE, validate=False)
-                resize_img.save(os.path.join(RESIZE_IMAGE_DIR, image), img.format)
+        for i, image in enumerate(tqdm(images)):
+            with open(os.path.join(IMAGE_DIR,name, image), 'r+b') as f:
+                with Image.open(f) as img:
+                    # img = resize_image(img, IMAGE_SIZE)
+                    resize_img = resizeimage.resize_cover(img, IMAGE_SIZE, validate=False)
+                    resize_img.save(os.path.join(RESIZE_IMAGE_DIR, name+'_'+str(i)+'.jpg'), img.format)
 
     print('Finish resizing images')
 
-#resize_image()
+# resize_image()

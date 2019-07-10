@@ -55,10 +55,11 @@ class FC(nn.Module):
 
 model=CNN().to(device)
 
-train=Traindataset()
-trainloader=DataLoader(dataset=train, batch_size=5, shuffle=True)
-testloader = DataLoader(dataset=train, batch_size=5, shuffle=True)
-optimizer = torch.optim.Adam(model.parameters(), lr=0.000005)#,weight_decay=0)
+train=Traindataset("./resize")
+test=Traindataset("./resizetest")
+trainloader=DataLoader(dataset=train, batch_size=10, shuffle=True)
+testloader = DataLoader(dataset=test, batch_size=1, shuffle=True)
+optimizer = torch.optim.Adam(model.parameters(), lr=0.0000008)#,weight_decay=0)
 
 criterion=torch.nn.CrossEntropyLoss()
 losses=0
@@ -87,7 +88,7 @@ for _ in range(EPOCH):
           label = label.to(device)
           y_pred = model(img)
           # yy = y_pred.reshape(y_pred.shape[0])
-          predicted = torch.argmax(y_pred,dim=0)
+          predicted = torch.argmax(y_pred,dim=1)
           total += label.size(0)
           correct += (predicted == label).sum().item()
 
