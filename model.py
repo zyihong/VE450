@@ -1,47 +1,51 @@
 import torch
 import torch.nn as nn
-from torch.utils.data import Dataset,DataLoader,TensorDataset
+from torch.utils.data import Dataset, DataLoader, TensorDataset
 import torch.nn.functional as F
 from data import Traindataset
 
-EPOCH=800
+EPOCH = 60
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+
 
 class CNN(nn.Module):
     def __init__(self):
-        super(CNN,self).__init__()
-        self.conv=torch.nn.Conv2d(3,12,kernel_size=3,padding=1)
-        self.act=torch.nn.ReLU()
-        self.conv2=torch.nn.Conv2d(12,12,kernel_size=3,padding=1)
+        super(CNN, self).__init__()
+        self.conv = torch.nn.Conv2d(3, 12, kernel_size=3, padding=1)
+        self.act = torch.nn.ReLU()
+        self.conv2 = torch.nn.Conv2d(12, 12, kernel_size=3, padding=1)
         # self.max=torch.nn.MaxPool2d(2,2)
         # self.conv3=torch.nn.Conv2d(12,24,kernel_size=3,padding=1)
-        self.fc1=torch.nn.Linear(64*64*12,100)
-        self.fc2=torch.nn.Linear(100,5)
-        self.sig=torch.nn.Sigmoid()
-    def forward(self,x):
-        convout=self.conv(x)
-        convout2=self.conv2(F.relu(convout))
+        self.fc1 = torch.nn.Linear(64 * 64 * 12, 100)
+        self.fc2 = torch.nn.Linear(100, 5)
+        self.sig = torch.nn.Sigmoid()
+
+    def forward(self, x):
+        convout = self.conv(x)
+        convout2 = self.conv2(F.relu(convout))
         # convout2=self.max(F.relu(convout2))
         # convout3=self.conv3(convout2)
-        fcout1=self.fc1(self.act(convout2).view(convout2.shape[0], -1))
-        output=self.fc2(self.act(fcout1))
-        output=self.sig(output)
+        fcout1 = self.fc1(self.act(convout2).view(convout2.shape[0], -1))
+        output = self.fc2(self.act(fcout1))
+        output = self.sig(output)
         return output
+
 
 class FC(nn.Module):
     def __init__(self):
-        super(FC,self).__init__()
+        super(FC, self).__init__()
 
         # self.conv = torch.nn.Conv2d(3, 12, kernel_size=3, padding=1)
         # self.max = torch.nn.MaxPool2d(2, 2)
         # self.fc1 = torch.nn.Linear(12 * 32 * 32, 10)
         # self.fc2 = torch.nn.Linear(10, 1)
-        self.fc1=torch.nn.Linear(3*64*64, 1)
+        self.fc1 = torch.nn.Linear(3 * 64 * 64, 1)
         self.sig = torch.nn.Sigmoid()
 
-        self.sig=torch.nn.Sigmoid()
-    def forward(self,x):
-        fcout1=self.fc1(x.view(x.shape[0], -1))
+        self.sig = torch.nn.Sigmoid()
+
+    def forward(self, x):
+        fcout1 = self.fc1(x.view(x.shape[0], -1))
         output = self.sig(fcout1)
         # convout = self.conv(x)
         # max = self.max(F.relu(convout))
@@ -51,6 +55,7 @@ class FC(nn.Module):
         #
         # output = self.sig(fc2)
         return output
+
 
 
 model=CNN().to(device)
@@ -80,10 +85,12 @@ for _ in range(EPOCH):
       # model.zero_grad()
       optimizer.step()
 
+
     total = 0
     correct = 0
     with torch.no_grad():
         for (img, label) in testloader:
+
           img = img.to(device)
           label = label.to(device)
           y_pred = model(img)
@@ -92,8 +99,7 @@ for _ in range(EPOCH):
           total += label.size(0)
           correct += (predicted == label).sum().item()
 
+
     print('loss: ', losses, 'acc: ', (100 * correct / total))
 
     losses = 0
-
-
