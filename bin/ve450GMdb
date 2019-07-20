@@ -1,0 +1,53 @@
+#!/bin/bash
+# ve450GMdb
+
+# Stop on errors
+set -e
+
+# Sanity check command line options
+usage() {
+  echo "Usage: $0 (create|destroy|reset|dump)"
+}
+
+if [ $# -ne 1 ]; then
+  usage
+  exit 1
+fi
+
+# Parse argument.  $1 is the first argument
+case $1 in
+  #"create_user")
+   #     echo "+ create new mysql user ve450"
+    #    mysql -u root -e "create user 've450'@'localhost' identified by 'VE450';"
+  #;;
+  "create")
+        echo "+ create database if not exists ve450
+        + mysql -u root ve450 < sql/schema.sql"
+        mysql -u root -e "create database if not exists ve450;"
+        mysql -u root ve450 < sql/schema.sql
+    ;;
+
+
+  "destroy")
+      	echo "+ drop database ve450"
+      	mysql -u root -e "drop database ve450;"
+    ;;
+
+  "reset")
+      	echo "+ mysql -u root -e \"drop database ve450; create database ve450;\"
+        + mysql -u root ve450 < sql/schema.sql"
+
+        mysql -u root -e "drop database ve450;create database ve450;"
+        # mysql -u root -e "create database ve450;"
+        mysql -u root ve450 < sql/schema.sql
+    ;;
+
+  "dump")
+        echo "+ mysql -u root VE450 < sql/data.sql"
+        mysql -u root ve450 < sql/data.sql
+    ;;
+  *)
+    usage
+    exit 1
+    ;;
+esac
