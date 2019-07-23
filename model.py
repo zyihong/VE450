@@ -3,9 +3,12 @@ import torch.nn as nn
 from torch.utils.data import Dataset, DataLoader, TensorDataset
 import torch.nn.functional as F
 from data import Traindataset
-
-EPOCH = 60
+from tqdm import tqdm
+EPOCH = 10
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+# device = torch.device('cpu')
+LOAD_FROM_CHECKPOINT=True
+
 
 
 class CNN(nn.Module):
@@ -59,6 +62,10 @@ class FC(nn.Module):
 
 
 model=CNN().to(device)
+if LOAD_FROM_CHECKPOINT:
+    model.load_state_dict(torch.load("./model.ckpt"))
+
+
 
 train=Traindataset("./resize")
 test=Traindataset("./resizetest")
@@ -103,3 +110,5 @@ for _ in range(EPOCH):
     print('loss: ', losses, 'acc: ', (100 * correct / total))
 
     losses = 0
+
+torch.save(model.state_dict(),"./model.ckpt")
