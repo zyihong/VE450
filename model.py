@@ -3,7 +3,7 @@ import torch.nn as nn
 from torch.utils.data import Dataset, DataLoader, TensorDataset
 import torch.nn.functional as F
 from data import Traindataset
-
+from fetch_size import label2type, fetch_size
 EPOCH = 60
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
@@ -68,6 +68,7 @@ optimizer = torch.optim.Adam(model.parameters(), lr=0.0000008)#,weight_decay=0)
 
 criterion=torch.nn.CrossEntropyLoss()
 losses=0
+brand='GM'
 for _ in range(EPOCH):
     for (img,label) in trainloader:
       img = img.to(device)
@@ -96,6 +97,9 @@ for _ in range(EPOCH):
           y_pred = model(img)
           # yy = y_pred.reshape(y_pred.shape[0])
           predicted = torch.argmax(y_pred,dim=1)
+          #fetch_size
+          size=fetch_size(label2type[predicted],brand)
+          print('['+label2type[predicted]+', '+brand+', '+size+']')
           total += label.size(0)
           correct += (predicted == label).sum().item()
 
